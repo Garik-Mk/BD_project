@@ -1,17 +1,39 @@
-from sqlalchemy import create_engine, exc, text
-from sqlalchemy import engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import database_exists, create_database
+from dotenv import dotenv_values
+import sqlalchemy as sql
 
 
-db_user = "postgres"
-db_password = "password"
-db_host = "localhost"
-db_port = "5432"
+class ZooDB:
+    engine: sql.Engine
 
-default_connection_string = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/"
-creation_engine = create_engine(default_connection_string, isolation_level="AUTOCOMMIT")
-if not database_exists(creation_engine.url):
-    create_database(creation_engine.url)
+    def __init__(self) -> None:
+        ...
 
-print(database_exists(creation_engine.url))
+    def __connect_to_DB() -> sql.Engine:
+        config = dotenv_values()
+        session_url = sql.engine.URL.create(
+            drivername='postgresql+psycopg2',
+            username=config.get("POSTGRES_USER"),
+            password=config.get("POSTGRES_PASSWORD"),
+            host=config.get("POSTGRES_HOST"),
+            database=config.get("POSTGRES_DB"),
+            port=config.get("POSTGRES_PORT")
+        )
+        engine = sql.create_engine(session_url)
+        return engine
+
+    def connect_to_DB(self) -> bool:
+        """Connect to database. Return True if connection established"""
+        ZooDB.engine = ZooDB.__connect_to_DB()
+        return True
+
+    def create_all_tables(force=False) -> bool:
+        """Creates creates all tables.
+
+        Parameters
+        ----------
+        force: bool
+            if true given, deletes previous tables and creates them from scratch
+        """
+        if not sql.inspect(ZooDB.engine).has_table('test'):
+            print(False)
+
