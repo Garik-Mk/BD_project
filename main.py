@@ -1,6 +1,7 @@
 from dotenv import dotenv_values
 import sqlalchemy as sql
 
+import model
 
 class ZooDB:
     engine: sql.Engine
@@ -31,9 +32,9 @@ class ZooDB:
 
         Parameters
         ----------
-        force: bool
+        force: bool #TODO
             if true given, deletes previous tables and creates them from scratch
         """
-        if not sql.inspect(ZooDB.engine).has_table('test'):
-            print(False)
+        model.BASE.metadata.create_all(ZooDB.engine)
+
 
