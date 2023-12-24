@@ -1,14 +1,19 @@
 from dotenv import dotenv_values
+from fastapi import FastAPI, HTTPException, status
 import sqlalchemy as sql
+from sqlalchemy.orm import sessionmaker
 
 import model
 
 
 class ZooDB:
     engine: sql.Engine
+    session: sql.orm.session.Session
 
     def __init__(self) -> None:
-        ...
+        self.connect_to_DB()
+        if not sql.inspect(ZooDB.engine).has_table('zoocomplex'):
+            self.create_all_tables()
 
     def __connect_to_DB() -> sql.Engine:
         config = dotenv_values()
@@ -26,6 +31,7 @@ class ZooDB:
     def connect_to_DB(self) -> bool:
         """Connect to database. Return True if connection established"""
         ZooDB.engine = ZooDB.__connect_to_DB()
+        ZooDB.session = sessionmaker(bind=ZooDB.engine)()
         return True
 
     def create_all_tables(force=False) -> bool:
