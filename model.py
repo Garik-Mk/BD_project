@@ -6,7 +6,7 @@ BASE = declarative_base()
 class ZooComplex(BASE):
     __tablename__ = 'zoocomplex'
     _id = Column(Integer, primary_key=True, autoincrement=True)
-    complex_name = (String(32))
+    complex_name = Column(String(32))
     count = Column(Integer, nullable=True)
 
 
