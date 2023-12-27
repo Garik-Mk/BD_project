@@ -86,6 +86,47 @@ async def create_specie(
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Specie already exists")
 
 
+@APP.get("/get_specie/{specie_id}", tags=["specie"])
+async def get_specie(specie_id: int):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    specie = ZooDB.session.query(model.Species).get(specie_id)
+    if specie:
+        return specie
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Specie not found")
+
+
+@APP.put("/update_specie/{specie_id}", tags=["specie"])
+async def update_specie(specie_id: int, specie_update: model.Species):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    specie = ZooDB.session.query(model.Species).get(specie_id)
+    if specie:
+        specie.accommodation_id = specie_update.accommodation_id
+        specie.specie_name = specie_update.specie_name
+        specie.family = specie_update.family
+        specie.habitat = specie_update.habitat
+        specie.live_duration = specie_update.live_duration
+        ZooDB.session.commit()
+        return f"Specie {specie_id} updated"
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Specie not found")
+
+
+@APP.delete("/delete_specie/{specie_id}", tags=["specie"])
+async def delete_specie(specie_id: int):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    specie = ZooDB.session.query(model.Species).get(specie_id)
+    if specie:
+        ZooDB.session.delete(specie)
+        ZooDB.session.commit()
+        return f"Specie {specie_id} deleted"
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Specie not found")
+
+
 @APP.post("/create_accommodation", tags=["accommodation"])
 async def create_accommodation(
     name: str,
