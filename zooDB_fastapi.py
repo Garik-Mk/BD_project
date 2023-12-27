@@ -22,6 +22,45 @@ async def create_zoocomplex(
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Complex already exists")
 
 
+@APP.get("/get_zoocomplex/{complex_id}", tags=["zoocomplex"])
+async def get_zoocomplex(complex_id: int):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    zoocomplex = ZooDB.session.query(model.ZooComplex).get(complex_id)
+    if zoocomplex:
+        return zoocomplex
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Zoo Complex not found")
+
+
+@APP.put("/update_zoocomplex/{complex_id}", tags=["zoocomplex"])
+async def update_zoocomplex(complex_id: int, complex_update: model.ZooComplex):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    zoocomplex = ZooDB.session.query(model.ZooComplex).get(complex_id)
+    if zoocomplex:
+        zoocomplex.complex_name = complex_update.complex_name
+        ZooDB.session.commit()
+        return f"Zoo Complex {complex_id} updated"
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Zoo Complex not found")
+
+
+@APP.delete("/delete_zoocomplex/{complex_id}", tags=["zoocomplex"])
+async def delete_zoocomplex(complex_id: int):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    
+    zoocomplex = ZooDB.session.query(model.ZooComplex).get(complex_id)
+    
+    if zoocomplex:
+        ZooDB.session.delete(zoocomplex)
+        ZooDB.session.commit()
+        return f"Zoo Complex {complex_id} deleted"
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Zoo Complex not found")
+
+
 @APP.post("/create_specie", tags=["specie"])
 async def create_specie(
     accommodation_id: int,
