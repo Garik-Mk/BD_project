@@ -46,3 +46,26 @@ async def create_specie(
     else:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Specie already exists")
 
+
+@APP.post("/create_accommodation", tags=["accommodation"])
+async def create_accommodation(
+    name: str,
+    complex_id: int,
+    has_pool: int = None,
+    area: float = None
+):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    if ZooDB.session.query(model.Accommodations).filter(model.Accommodations.name==name).first() is None:
+        new_accommodation = model.Accommodations(
+            name=name,
+            complex_id=complex_id,
+            has_pool=has_pool,
+            area=area
+        )
+        ZooDB.session.add(new_accommodation)
+        ZooDB.session.commit()
+        return f"{new_accommodation.name} accommodation added"
+    else:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Accommodation already exists")
+
