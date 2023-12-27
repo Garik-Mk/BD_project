@@ -5,7 +5,7 @@ import model
 APP = FastAPI()
 
 
-@APP.post("/create_zoocomplex")
+@APP.post("/create_zoocomplex", tags=["zoocomplex"])
 async def create_zoocomplex(
     complex_name: str
 ):
