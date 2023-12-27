@@ -38,7 +38,7 @@ class ZooDB:
 
         Parameters
         ----------
-        force: bool #TODO
+        force: bool
             if true given, deletes previous tables and creates them from scratch
         """
         model.BASE.metadata.create_all(ZooDB.engine)
