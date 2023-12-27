@@ -108,3 +108,42 @@ async def create_accommodation(
     else:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Accommodation already exists")
 
+
+@APP.get("/get_accommodation/{accommodation_id}", tags=["accommodation"])
+async def get_accommodation(accommodation_id: int):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    accommodation = ZooDB.session.query(model.Accommodations).get(accommodation_id)
+    if accommodation:
+        return accommodation
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Accommodation not found")
+
+
+@APP.put("/update_accommodation/{accommodation_id}", tags=["accommodation"])
+async def update_accommodation(accommodation_id: int, accommodation_update: model.Accommodations):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    accommodation = ZooDB.session.query(model.Accommodations).get(accommodation_id)
+    if accommodation:
+        accommodation.name = accommodation_update.name
+        accommodation.complex_id = accommodation_update.complex_id
+        accommodation.has_pool = accommodation_update.has_pool
+        accommodation.area = accommodation_update.area
+        ZooDB.session.commit()
+        return f"Accommodation {accommodation_id} updated"
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Accommodation not found")
+
+
+@APP.delete("/delete_accommodation/{accommodation_id}", tags=["accommodation"])
+async def delete_accommodation(accommodation_id: int):
+    if not ZooDB.is_connected():
+        ZooDB.connect_to_DB()
+    accommodation = ZooDB.session.query(model.Accommodations).get(accommodation_id)
+    if accommodation:
+        ZooDB.session.delete(accommodation)
+        ZooDB.session.commit()
+        return f"Accommodation {accommodation_id} deleted"
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Accommodation not found")
