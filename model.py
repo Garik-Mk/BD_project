@@ -11,6 +11,7 @@ class ZooComplex(BASE):
 class Accommodations(BASE):
     __tablename__ = 'accommodations'
     _id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(32))
     complex_id = Column(Integer, ForeignKey(ZooComplex._id), nullable=False)
     has_pool = Column(Boolean)
     area = Column(FLOAT)
